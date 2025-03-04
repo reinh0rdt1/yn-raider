@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YN Raider</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="modal" id="disclaimer-modal">
+        <div class="modal-content">
+            <h2>Disclaimer</h2>
+            <p>This tool is provided for educational purposes only. Unauthorized use is prohibited and may violate Discord's Terms of Use. The user assumes all responsibility for their actions.</p>
+            <button class="btn btn-primary" id="agree-disclaimer" aria-label="Agree to disclaimer"> Agree</button>
+        </div>
+    </div>
+    <div class="modal" id="proxy-modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Proxy Settings</h2>
+            <textarea id="proxy-area" placeholder="Enter proxies (one per line, e.g., ip:port)" aria-label="Proxy input area"></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="save-proxies" aria-label="Save proxies">Save</button>
+                <button class="btn btn-secondary" id="clear-proxies" aria-label="Clear proxies">Clear</button>
+                <button class="btn btn-danger" id="close-proxy-modal" aria-label="Close proxy settings">Close</button>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="main-container">
+        <header>
+            <div class="logo">
+                YN-RAIDER / FREE VERSION
+            </div>
+            <div class="status-item">
+                <div class="status-indicator status-inactive" id="connection-status"></div>
+                <span id="status-text">Offline</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="token-input">
+                    <h2>Token Input</h2>
+                    <textarea id="token-area" placeholder="Paste Tokens (one per line)" aria-label="Token input area"></textarea>
+                    <div class="token-actions">
+                        <button class="btn btn-primary" id="check-tokens" aria-label="Check tokens">Check</button>
+                        <button class="btn btn-secondary" id="import-tokens" aria-label="Import tokens from file">Import .txt</button>
+                    </div>
+                </div>
+                <div class="stats">
+                    <h2>Result</h2>
+                    <div class="stat-item">
+                        <span class="stat-label">Valid Tokens:</span>
+                        <span class="stat-value valid" id="valid-tokens">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Invalid Tokens:</span>
+                        <span class="stat-value invalid" id="invalid-tokens">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Nitro Tokens:</span>
+                        <span class="stat-value" id="nitro-tokens">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-panel">
+                <div class="tabs">
+                    <div class="tab" data-tab="joiner" role="tab" aria-selected="false">Joiner</div>
+                    <div class="tab" data-tab="leaver" role="tab" aria-selected="false">Leaver</div>
+                    <div class="tab" data-tab="spammer" role="tab" aria-selected="false">Spammer</div>
+                    <div class="tab active" data-tab="checker" role="tab" aria-selected="true">Checker</div>
+                    <div class="tab" data-tab="misc" role="tab" aria-selected="false">Misc</div>
+                </div>
+
+                <!-- Joiner Tab -->
+                <div class="tab-content" id="joiner">
+                    <div class="module">
+                        <div class="module-header">
+                            <h3 class="module-title">Server Joiner</h3>
+                            <div class="module-actions">
+                                <button class="btn btn-success" id="start-joiner" aria-label="Start server joiner">Start</button>
+                                <button class="btn btn-danger" id="stop-joiner" aria-label="Stop server joiner">Stop</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="invite-code">Invite Code / Link</label>
+                            <input type="text" class="form-control" id="invite-code" placeholder="discord.gg/invite" aria-label="Invite code input">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="join-delay">Delay (sec)</label>
+                                <input type="number" class="form-control" id="join-delay" min="0" value="2" aria-label="Join delay input">
+                            </div>
+                            <div class="form-group">
+                                <label for="max-joins">Max Tokens</label>
+                                <input type="number" class="form-control" id="max-joins" min="1" value="10" aria-label="Max tokens for join">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logs" id="joiner-logs" aria-live="polite">
+                        <div class="log-entry">
+                            <span class="log-time">[System]</span>
+                            <span class="log-info">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <span id="joiner-status">Status: Waiting...</span>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="joiner-progress"></div>
+                        </div>
+                        <span id="joiner-counter">0/0</span>
+                    </div>
+                </div>
+
+                <!-- Leaver Tab -->
+                <div class="tab-content" id="leaver">
+                    <div class="module">
+                        <div class="module-header">
+                            <h3 class="module-title">Server Leaver</h3>
+                            <div class="module-actions">
+                                <button class="btn btn-success" id="start-leaver" aria-label="Start server leaver">Start</button>
+                                <button class="btn btn-danger" id="stop-leaver" aria-label="Stop server leaver">Stop</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="server-id">Guild ID</label>
+                            <input type="text" class="form-control" id="server-id" placeholder="Guild ID" aria-label="Guild ID input">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="leave-delay">Delay (sec)</label>
+                                <input type="number" class="form-control" id="leave-delay" min="0" value="2" aria-label="Leave delay input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logs" id="leaver-logs" aria-live="polite">
+                        <div class="log-entry">
+                            <span class="log-time">[System]</span>
+                            <span class="log-info">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <span id="leaver-status">Status: Waiting...</span>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="leaver-progress"></div>
+                        </div>
+                        <span id="leaver-counter">0/0</span>
+                    </div>
+                </div>
+
+                <!-- Spammer Tab -->
+                <div class="tab-content" id="spammer">
+                    <div class="module">
+                        <div class="module-header">
+                            <h3 class="module-title">Channel Spammer</h3>
+                            <div class="module-actions">
+                                <button class="btn btn-success" id="start-spammer" aria-label="Start channel spammer">Start</button>
+                                <button class="btn btn-danger" id="stop-spammer" aria-label="Stop channel spammer">Stop</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="spam-channel">Channel ID</label>
+                            <input type="text" class="form-control" id="spam-channel" placeholder="Channel ID" aria-label="Channel ID input">
+                        </div>
+                        <div class="form-group">
+                            <label for="spam-message">Message</label>
+                            <textarea class="form-control" id="spam-message" placeholder="Enter Message" style="height: 80px" aria-label="Spam message input"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="spam-delay">Delay (sec)</label>
+                                <input type="number" class="form-control" id="spam-delay" min="0" step="0.1" value="1" aria-label="Spam delay input">
+                            </div>
+                            <div class="form-group">
+                                <label for="spam-count">Count</label>
+                                <input type="number" class="form-control" id="spam-count" min="1" value="10" aria-label="Spam count input">
+                            </div>
+                        </div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="random-strings" aria-label="Enable random strings">
+                                <label for="random-strings">Random Strings</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="random-emojis" aria-label="Enable random emojis">
+                                <label for="random-emojis">Random Emojis</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logs" id="spammer-logs" aria-live="polite">
+                        <div class="log-entry">
+                            <span class="log-time">[System]</span>
+                            <span class="log-info">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <span id="spammer-status">Status: Waiting...</span>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="spammer-progress"></div>
+                        </div>
+                        <span id="spammer-counter">0/0</span>
+                    </div>
+                </div>
+
+                <!-- Checker Tab -->
+                <div class="tab-content active" id="checker">
+                    <div class="module">
+                        <div class="module-header">
+                            <h3 class="module-title">Token Checker</h3>
+                            <div class="module-actions">
+                                <button class="btn btn-success" id="start-checker" aria-label="Start token checker">Start</button>
+                                <button class="btn btn-primary" id="export-tokens" aria-label="Export valid tokens">Export</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="parallel-checks">Threads</label>
+                                <input type="number" class="form-control" id="parallel-checks" min="1" max="10" value="5" aria-label="Number of parallel checks">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logs" id="checker-logs" aria-live="polite">
+                        <div class="log-entry">
+                            <span class="log-time">[System]</span>
+                            <span class="log-info">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <span id="checker-status">Status: Waiting...</span>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="checker-progress"></div>
+                        </div>
+                        <span id="checker-counter">0/0</span>
+                    </div>
+                </div>
+
+                <!-- Misc Tab -->
+                <div class="tab-content" id="misc">
+                    <div class="module">
+                        <div class="module-header">
+                            <h3 class="module-title">Miscellaneous</h3>
+                        </div>
+                        <button class="btn btn-primary" id="show-proxy-settings" aria-label="Show proxy settings">Proxy Settings</button>
+                    </div>
+                    <div class="logs" id="misc-logs" aria-live="polite">
+                        <div class="log-entry">
+                            <span class="log-time">[System]</span>
+                            <span class="log-info">Waiting...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="creator">Created by Reinhardt</div>
+    <a href="https://discord.gg/fPd9tXZtUe" target="_blank" class="discord-icon" aria-label="Contact via Discord">
+        Contact
+    </a>
+
+    <input type="file" id="token-file-input" style="display:none" aria-hidden="true">
+    <input type="file" id="proxy-file-input" style="display:none" aria-hidden="true">
+
+    <script>
+        let tokens = [];
+        let validTokens = [];
+
+        function log(tabId, message, type = 'info') {
+            const logArea = document.getElementById(`${tabId}-logs`);
+            if (!logArea) return;
+            const existingLogs = Array.from(logArea.getElementsByClassName('log-entry')).map(e => e.textContent);
+            const logText = `[${new Date().toLocaleTimeString()}] ${message}`;
+            if (!existingLogs.includes(logText)) {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString()}]</span><span class="log-info log-${type}">${message}</span>`;
+                logArea.appendChild(entry);
+                logArea.scrollTop = logArea.scrollHeight;
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function updateStatus(running) {
+            const statusIndicator = document.getElementById('connection-status');
+            const statusText = document.getElementById('status-text');
+            if (running) {
+                statusIndicator.classList.remove('status-inactive');
+                statusIndicator.classList.add('status-active');
+                statusText.textContent = 'Online';
+            } else {
+                statusIndicator.classList.remove('status-active');
+                statusIndicator.classList.add('status-inactive');
+                statusText.textContent = 'Offline';
+            }
+        }
+
+        function updateCheckerStats(results) {
+            const valid = results.filter(r => r.status === 'success' && !r.message.includes('Unverified')).length;
+            const invalid = results.filter(r => r.status === 'error' || r.message.includes('Unverified')).length;
+            const nitro = results.filter(r => r.nitro).length;
+            document.getElementById('valid-tokens').textContent = valid;
+            document.getElementById('invalid-tokens').textContent = invalid;
+            document.getElementById('nitro-tokens').textContent = nitro;
+            validTokens = results.filter(r => r.status === 'success' && !r.message.includes('Unverified')).map(r => r.fullToken);
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        window.addEventListener('load', () => {
+            document.getElementById('disclaimer-modal').style.display = 'flex';
+            document.getElementById('main-container').classList.add('blur');
+        });
+
+        document.getElementById('agree-disclaimer').addEventListener('click', () => {
+            document.getElementById('disclaimer-modal').style.display = 'none';
+            document.getElementById('main-container').classList.remove('blur');
+        });
+
+        document.getElementById('import-tokens').addEventListener('click', () => {
+            document.getElementById('token-file-input').click();
+        });
+
+        document.getElementById('token-file-input').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                tokens = e.target.result.split('\n').map(t => t.trim()).filter(t => t);
+                document.getElementById('token-area').value = tokens.join('\n');
+                log('checker', `Imported ${tokens.length} tokens`, 'success');
+                showNotification(`Imported ${tokens.length} tokens`, 'success');
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('start-joiner').addEventListener('click', () => {
+            if (!validTokens.length) {
+                log('joiner', 'No valid tokens available.', 'error');
+                showNotification('No valid tokens.', 'error');
+                return;
+            }
+            const inviteCode = document.getElementById('invite-code').value;
+            if (!inviteCode) {
+                log('joiner', 'Invite code required', 'error');
+                return;
+            }
+            const delay = document.getElementById('join-delay').value || '2';
+            const maxJoins = document.getElementById('max-joins').value || tokens.length;
+            fetch('/join', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tokens: validTokens, inviteCode, delay, maxJoins, maxThreads: 5 })
+            }).then(response => response.json()).then(data => {
+                data.results.forEach(result => log('joiner', `${result.token}: ${result.message}`, result.status));
+                showNotification('Joiner started', 'info');
+                pollStatus('joiner', Math.min(maxJoins, validTokens.length));
+            }).catch(err => {
+                log('joiner', `Error: ${err.message}`, 'error');
+            });
+        });
+
+        document.getElementById('stop-joiner').addEventListener('click', () => {
+            fetch('/stop_joiner', { method: 'POST' }).then(response => response.json()).then(data => {
+                log('joiner', 'Joiner stopped', 'info');
+                showNotification('Joiner stopped', 'info');
+            });
+        });
+
+        document.getElementById('start-leaver').addEventListener('click', () => {
+            if (!validTokens.length) {
+                log('leaver', 'No valid tokens available.', 'error');
+                showNotification('No valid tokens.', 'error');
+                return;
+            }
+            const serverId = document.getElementById('server-id').value;
+            if (!serverId) {
+                log('leaver', 'Guild ID required', 'error');
+                return;
+            }
+            const delay = document.getElementById('leave-delay').value || '2';
+            fetch('/leave', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tokens: validTokens, serverId, delay, maxThreads: 5 })
+            }).then(response => response.json()).then(data => {
+                data.results.forEach(result => log('leaver', `${result.token}: ${result.message}`, result.status));
+                showNotification('Leaver started', 'info');
+                pollStatus('leaver', validTokens.length);
+            }).catch(err => {
+                log('leaver', `Error: ${err.message}`, 'error');
+            });
+        });
+
+        document.getElementById('stop-leaver').addEventListener('click', () => {
+            fetch('/stop_leaver', { method: 'POST' }).then(response => response.json()).then(data => {
+                log('leaver', 'Leaver stopped', 'info');
+                showNotification('Leaver stopped', 'info');
+            });
+        });
+
+        document.getElementById('start-spammer').addEventListener('click', () => {
+            if (!validTokens.length) {
+                log('spammer', 'No valid tokens available.', 'error');
+                showNotification('No valid tokens.', 'error');
+                return;
+            }
+            const channelId = document.getElementById('spam-channel').value;
+            const message = document.getElementById('spam-message').value;
+            if (!channelId || !message) {
+                log('spammer', 'Channel ID or message required', 'error');
+                return;
+            }
+            const delay = document.getElementById('spam-delay').value || '1';
+            const spamCount = document.getElementById('spam-count').value || '10';
+            fetch('/spam', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tokens: validTokens, channelId, message, delay, spamCount, maxThreads: 5 })
+            }).then(response => response.json()).then(data => {
+                data.results.forEach(result => log('spammer', `${result.token}: ${result.message}`, result.status));
+                showNotification('Spammer started', 'info');
+                pollStatus('spammer', validTokens.length * spamCount);
+            }).catch(err => {
+                log('spammer', `Error: ${err.message}`, 'error');
+            });
+        });
+
+        document.getElementById('stop-spammer').addEventListener('click', () => {
+            fetch('/stop_spammer', { method: 'POST' }).then(response => response.json()).then(data => {
+                log('spammer', 'Spammer stopped', 'info');
+                showNotification('Spammer stopped', 'info');
+            });
+        });
+
+        document.getElementById('start-checker').addEventListener('click', () => {
+            tokens = document.getElementById('token-area').value.split('\n').map(t => t.trim()).filter(t => t);
+            if (!tokens.length) {
+                log('checker', 'No tokens to check', 'error');
+                return;
+            }
+            const maxThreads = document.getElementById('parallel-checks').value || '5';
+            fetch('/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tokens, maxThreads })
+            }).then(response => response.json()).then(data => {
+                data.results.forEach(result => log('checker', `${result.token}: ${result.message}`, result.status));
+                showNotification('Checker started', 'info');
+                pollStatus('checker', tokens.length);
+            }).catch(err => {
+                log('checker', `Error: ${err.message}`, 'error');
+            });
+        });
+
+        document.getElementById('check-tokens').addEventListener('click', () => {
+            document.getElementById('start-checker').click();
+        });
+
+        document.getElementById('show-proxy-settings').addEventListener('click', () => {
+            document.getElementById('proxy-modal').style.display = 'flex';
+            document.getElementById('main-container').classList.add('blur');
+        });
+
+        document.getElementById('save-proxies').addEventListener('click', () => {
+            const proxies = document.getElementById('proxy-area').value.split('\n').map(p => p.trim()).filter(p => p);
+            fetch('/proxies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ proxies })
+            }).then(response => response.json()).then(data => {
+                log('misc', data.message, 'success');
+                showNotification(data.message, 'success');
+                document.getElementById('proxy-modal').style.display = 'none';
+                document.getElementById('main-container').classList.remove('blur');
+            });
+        });
+
+        document.getElementById('clear-proxies').addEventListener('click', () => {
+            fetch('/proxies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ proxies: [] })
+            }).then(response => response.json()).then(data => {
+                log('misc', 'Proxies cleared', 'success');
+                showNotification('Proxies cleared', 'success');
+                document.getElementById('proxy-area').value = '';
+            });
+        });
+
+        document.getElementById('close-proxy-modal').addEventListener('click', () => {
+            document.getElementById('proxy-modal').style.display = 'none';
+            document.getElementById('main-container').classList.remove('blur');
+        });
+
+        document.getElementById('show-disclaimer').addEventListener('click', () => {
+            document.getElementById('disclaimer-modal').style.display = 'flex';
+            document.getElementById('main-container').classList.add('blur');
+        });
+
+        function pollStatus(tab, total) {
+            fetch('/check_status')
+                .then(response => response.json())
+                .then(data => {
+                    const results = tab === 'checker' ? data.checker_results :
+                                tab === 'joiner' ? data.joiner_results :
+                                tab === 'leaver' ? data.leaver_results :
+                                data.spammer_results;
+                    const isRunning = data[`${tab}_running`];
+                    results.forEach(result => log(tab, `${result.token}: ${result.message}`, result.status));
+
+                    const completed = results.length;
+                    document.getElementById(`${tab}-progress`).style.width = `${(completed / total) * 100}%`;
+                    document.getElementById(`${tab}-counter`).textContent = `${completed}/${total}`;
+
+                    if (tab === 'checker') updateCheckerStats(results);
+
+                    if (!isRunning || completed >= total) {
+                        document.getElementById(`${tab}-status`).textContent = 'Status: Completed';
+                        updateStatus(data.joiner_running || data.leaver_running || data.spammer_running || data.checker_running);
+                        showNotification(`${tab.charAt(0).toUpperCase() + tab.slice(1)} completed`, 'success');
+                    } else {
+                        document.getElementById(`${tab}-status`).textContent = 'Status: Running...';
+                        updateStatus(true);
+                        setTimeout(() => pollStatus(tab, total), 1000);
+                    }
+                });
+        }
+
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = `${Math.random() * 2 + 1}px`;
+            star.style.height = star.style.width;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            document.querySelector('.stars').appendChild(star);
+        }
+    </script>
+</body>
+</html>
