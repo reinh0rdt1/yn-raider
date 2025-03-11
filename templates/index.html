@@ -13,7 +13,7 @@
         <div class="modal-content">
             <h2>Disclaimer</h2>
             <p>This tool is provided for educational purposes only. Unauthorized use is prohibited and may violate Discord's Terms of Use. The user assumes all responsibility for their actions.</p>
-            <button class="btn btn-primary" id="agree-disclaimer" aria-label="Agree to disclaimer"> Agree</button>
+            <button class="btn btn-primary" id="agree-disclaimer" aria-label=" Agree to disclaimer"> Agree</button>
         </div>
     </div>
     <div class="modal" id="proxy-modal" style="display: none;">
@@ -74,7 +74,6 @@
                     <div class="tab" data-tab="misc" role="tab" aria-selected="false">Misc</div>
                 </div>
 
-                <!-- Joiner Tab -->
                 <div class="tab-content" id="joiner">
                     <div class="module">
                         <div class="module-header">
@@ -114,7 +113,6 @@
                     </div>
                 </div>
 
-                <!-- Leaver Tab -->
                 <div class="tab-content" id="leaver">
                     <div class="module">
                         <div class="module-header">
@@ -150,7 +148,6 @@
                     </div>
                 </div>
 
-                <!-- Spammer Tab -->
                 <div class="tab-content" id="spammer">
                     <div class="module">
                         <div class="module-header">
@@ -204,7 +201,6 @@
                     </div>
                 </div>
 
-                <!-- Checker Tab -->
                 <div class="tab-content active" id="checker">
                     <div class="module">
                         <div class="module-header">
@@ -236,7 +232,6 @@
                     </div>
                 </div>
 
-                <!-- Misc Tab -->
                 <div class="tab-content" id="misc">
                     <div class="module">
                         <div class="module-header">
@@ -425,7 +420,9 @@
                 return;
             }
             const channelId = document.getElementById('spam-channel').value;
-            const message = document.getElementById('spam-message').value;
+            let message = document.getElementById('spam-message').value;
+            const randomEmojis = document.getElementById('random-emojis').checked;
+            const randomStrings = document.getElementById('random-strings').checked;
             if (!channelId || !message) {
                 log('spammer', 'Channel ID or message required', 'error');
                 return;
@@ -435,7 +432,16 @@
             fetch('/spam', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tokens: validTokens, channelId, message, delay, spamCount, maxThreads: 5 })
+                body: JSON.stringify({
+                    tokens: validTokens,
+                    channelId,
+                    message,
+                    delay,
+                    spamCount,
+                    maxThreads: 5,
+                    randomEmojis,
+                    randomStrings
+                })
             }).then(response => response.json()).then(data => {
                 data.results.forEach(result => log('spammer', `${result.token}: ${result.message}`, result.status));
                 showNotification('Spammer started', 'info');
@@ -510,11 +516,6 @@
         document.getElementById('close-proxy-modal').addEventListener('click', () => {
             document.getElementById('proxy-modal').style.display = 'none';
             document.getElementById('main-container').classList.remove('blur');
-        });
-
-        document.getElementById('show-disclaimer').addEventListener('click', () => {
-            document.getElementById('disclaimer-modal').style.display = 'flex';
-            document.getElementById('main-container').classList.add('blur');
         });
 
         function pollStatus(tab, total) {
