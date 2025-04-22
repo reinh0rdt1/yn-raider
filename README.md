@@ -12,6 +12,7 @@ A lightweight Discord automation tool built with Flask and Python. Join servers,
 
 > **⚠️ Disclaimer**: This project is for **educational purposes only**. Use responsibly and adhere to [Discord Terms of Service](https://discord.com/terms). The author is not liable for misuse.
 
+> 👥 Need support? Discord Link: [Discord Link](https://discord.gg/HemBmKMYKF)
 ---
 
 ## ✨ Features
