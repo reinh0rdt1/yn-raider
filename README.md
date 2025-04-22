@@ -56,8 +56,6 @@ To get started, you'll need:
 - **Python 3.8+**: [Download here](https://www.python.org/downloads/)
 - **Git**: [Install Git](https://git-scm.com/downloads) (optional, for cloning)
 - **Proxies** (optional): Prepare a list of proxies (HTTP, HTTPS, SOCKS4, or SOCKS5) for Joiner and other features.
-- **2Captcha/CapMonster API Key** (optional): For CAPTCHA solving in Joiner (recommended for high success rates).
-
 ---
 
 ## 📦 Installation
