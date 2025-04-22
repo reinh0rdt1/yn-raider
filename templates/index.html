@@ -13,13 +13,19 @@
         <div class="modal-content">
             <h2>Disclaimer</h2>
             <p>This tool is provided for educational purposes only. Unauthorized use is prohibited and may violate Discord's Terms of Use. The user assumes all responsibility for their actions.</p>
-            <button class="btn btn-primary" id="agree-disclaimer" aria-label=" Agree to disclaimer"> Agree</button>
+            <button class="btn btn-primary" id="agree-disclaimer" aria-label="Agree to disclaimer">Agree</button>
         </div>
     </div>
     <div class="modal" id="proxy-modal" style="display: none;">
         <div class="modal-content">
             <h2>Proxy Settings</h2>
-            <textarea id="proxy-area" placeholder="Enter proxies (one per line, e.g., ip:port)" aria-label="Proxy input area"></textarea>
+            <select id="proxy-type" class="form-control" aria-label="Proxy type selection">
+                <option value="http">HTTP</option>
+                <option value="https">HTTPS</option>
+                <option value="socks4">SOCKS4</option>
+                <option value="socks5">SOCKS5</option>
+            </select>
+            <textarea id="proxy-area" placeholder="Enter proxies (one per line, e.g., ip:port or user:pass@ip:port)" aria-label="Proxy input area"></textarea>
             <div class="modal-actions">
                 <button class="btn btn-primary" id="save-proxies" aria-label="Save proxies">Save</button>
                 <button class="btn btn-secondary" id="clear-proxies" aria-label="Clear proxies">Clear</button>
@@ -67,11 +73,38 @@
 
             <div class="main-panel">
                 <div class="tabs">
+                    <div class="tab active" data-tab="checker" role="tab" aria-selected="true">Checker</div>
                     <div class="tab" data-tab="joiner" role="tab" aria-selected="false">Joiner</div>
                     <div class="tab" data-tab="leaver" role="tab" aria-selected="false">Leaver</div>
                     <div class="tab" data-tab="spammer" role="tab" aria-selected="false">Spammer</div>
-                    <div class="tab active" data-tab="checker" role="tab" aria-selected="true">Checker</div>
+                    <div class="tab" data-tab="token_manager" role="tab" aria-selected="false">Token Manager</div>
                     <div class="tab" data-tab="misc" role="tab" aria-selected="false">Misc</div>
+                </div>
+
+                <div class="tab-content active" id="checker">
+                    <div class="module">
+                        <div class="module-header">
+                            <h3 class="module-title">Token Checker</h3>
+                            <div class="module-actions">
+                                <button class="btn btn-success" id="start-checker" aria-label="Start token checker">Start</button>
+                                <button class="btn btn-primary" id="export-tokens" aria-label="Export valid tokens">Export</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="parallel-checks">Threads</label>
+                                <input type="number" class="form-control" id="parallel-checks" min="1" max="10" value="5" aria-label="Number of parallel checks">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logs" id="checker-logs" aria-live="polite"></div>
+                    <div class="status-bar">
+                        <span id="checker-status">Status: Waiting...</span>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="checker-progress"></div>
+                        </div>
+                        <span id="checker-counter">0/0</span>
+                    </div>
                 </div>
 
                 <div class="tab-content" id="joiner">
@@ -98,12 +131,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="logs" id="joiner-logs" aria-live="polite">
-                        <div class="log-entry">
-                            <span class="log-time">[System]</span>
-                            <span class="log-info">Waiting...</span>
-                        </div>
-                    </div>
+                    <div class="logs" id="joiner-logs" aria-live="polite"></div>
                     <div class="status-bar">
                         <span id="joiner-status">Status: Waiting...</span>
                         <div class="progress-container">
@@ -133,12 +161,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="logs" id="leaver-logs" aria-live="polite">
-                        <div class="log-entry">
-                            <span class="log-time">[System]</span>
-                            <span class="log-info">Waiting...</span>
-                        </div>
-                    </div>
+                    <div class="logs" id="leaver-logs" aria-live="polite"></div>
                     <div class="status-bar">
                         <span id="leaver-status">Status: Waiting...</span>
                         <div class="progress-container">
@@ -177,6 +200,10 @@
                         </div>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
+                                <input type="checkbox" id="disable-delay" aria-label="Disable delay">
+                                <label for="disable-delay">Disable Delay</label>
+                            </div>
+                            <div class="checkbox-item">
                                 <input type="checkbox" id="random-strings" aria-label="Enable random strings">
                                 <label for="random-strings">Random Strings</label>
                             </div>
@@ -184,14 +211,13 @@
                                 <input type="checkbox" id="random-emojis" aria-label="Enable random emojis">
                                 <label for="random-emojis">Random Emojis</label>
                             </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="add-everyone" aria-label="Add @everyone">
+                                <label for="add-everyone">Add @everyone</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="logs" id="spammer-logs" aria-live="polite">
-                        <div class="log-entry">
-                            <span class="log-time">[System]</span>
-                            <span class="log-info">Waiting...</span>
-                        </div>
-                    </div>
+                    <div class="logs" id="spammer-logs" aria-live="polite"></div>
                     <div class="status-bar">
                         <span id="spammer-status">Status: Waiting...</span>
                         <div class="progress-container">
@@ -201,34 +227,32 @@
                     </div>
                 </div>
 
-                <div class="tab-content active" id="checker">
+                <div class="tab-content" id="token_manager">
                     <div class="module">
                         <div class="module-header">
-                            <h3 class="module-title">Token Checker</h3>
+                            <h3 class="module-title">Token Manager</h3>
                             <div class="module-actions">
-                                <button class="btn btn-success" id="start-checker" aria-label="Start token checker">Start</button>
-                                <button class="btn btn-primary" id="export-tokens" aria-label="Export valid tokens">Export</button>
+                                <button class="btn btn-primary" id="export-tokens-manager" aria-label="Export tokens">Export Tokens</button>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="parallel-checks">Threads</label>
-                                <input type="number" class="form-control" id="parallel-checks" min="1" max="10" value="5" aria-label="Number of parallel checks">
-                            </div>
+                        <div class="token-table-container">
+                            <table class="token-table">
+                                <thead>
+                                    <tr>
+                                        <th>Token</th>
+                                        <th>Email</th>
+                                        <th>Created At</th>
+                                        <th>Username</th>
+                                        <th>User ID</th>
+                                        <th>Avatar</th>
+                                        <th>Verified</th>
+                                        <th>Nitro</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="token-table-body"></tbody>
+                            </table>
                         </div>
-                    </div>
-                    <div class="logs" id="checker-logs" aria-live="polite">
-                        <div class="log-entry">
-                            <span class="log-time">[System]</span>
-                            <span class="log-info">Waiting...</span>
-                        </div>
-                    </div>
-                    <div class="status-bar">
-                        <span id="checker-status">Status: Waiting...</span>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="checker-progress"></div>
-                        </div>
-                        <span id="checker-counter">0/0</span>
                     </div>
                 </div>
 
@@ -239,40 +263,48 @@
                         </div>
                         <button class="btn btn-primary" id="show-proxy-settings" aria-label="Show proxy settings">Proxy Settings</button>
                     </div>
-                    <div class="logs" id="misc-logs" aria-live="polite">
-                        <div class="log-entry">
-                            <span class="log-time">[System]</span>
-                            <span class="log-info">Waiting...</span>
-                        </div>
-                    </div>
+                    <div class="logs" id="misc-logs" aria-live="polite"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="creator">Created by Reinhardt</div>
-    <a href="https://discord.gg/fPd9tXZtUe" target="_blank" class="discord-icon" aria-label="Contact via Discord">
-        Contact
-    </a>
+    <a href="https://discord.gg/fPd9tXZtUe" target="_blank" class="discord-icon" aria-label="Contact via Discord">Contact</a>
 
     <input type="file" id="token-file-input" style="display:none" aria-hidden="true">
-    <input type="file" id="proxy-file-input" style="display:none" aria-hidden="true">
 
     <script>
         let tokens = [];
         let validTokens = [];
+        let isPolling = false;
+        let lastResults = {
+            checker: [],
+            joiner: [],
+            leaver: [],
+            spammer: []
+        };
 
         function log(tabId, message, type = 'info') {
             const logArea = document.getElementById(`${tabId}-logs`);
             if (!logArea) return;
-            const existingLogs = Array.from(logArea.getElementsByClassName('log-entry')).map(e => e.textContent);
-            const logText = `[${new Date().toLocaleTimeString()}] ${message}`;
-            if (!existingLogs.includes(logText)) {
-                const entry = document.createElement('div');
-                entry.className = 'log-entry';
-                entry.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString()}]</span><span class="log-info log-${type}">${message}</span>`;
-                logArea.appendChild(entry);
-                logArea.scrollTop = logArea.scrollHeight;
+
+            // ログエリアをクリア（初回のみ）
+            if (logArea.children.length === 0 || logArea.textContent.includes('Waiting...')) {
+                logArea.innerHTML = '';
+            }
+
+            // 同一メッセージでも追加
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString()}]</span><span class="log-${type}">${message}</span>`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+
+            // 最大100エントリに制限
+            const entries = logArea.getElementsByClassName('log-entry');
+            while (entries.length > 100) {
+                entries[0].remove();
             }
         }
 
@@ -308,6 +340,34 @@
             validTokens = results.filter(r => r.status === 'success' && !r.message.includes('Unverified')).map(r => r.fullToken);
         }
 
+        function updateTokenTable() {
+            fetch('/check_status')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('token-table-body');
+                    tbody.innerHTML = '';
+                    data.token_info.forEach(info => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${info.token}</td>
+                            <td>${info.email}</td>
+                            <td>${info.created_at}</td>
+                            <td>${info.username}</td>
+                            <td>${info.user_id}</td>
+                            <td><img src="${info.avatar}" alt="Avatar" onerror="this.src='https://via.placeholder.com/32'"></td>
+                            <td>${info.verified ? 'Yes' : 'No'}</td>
+                            <td>${info.nitro ? 'Yes' : 'No'}</td>
+                            <td>${info.message}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    log('token_manager', `Updated token table with ${data.token_info.length} entries`, 'info');
+                })
+                .catch(err => {
+                    log('token_manager', `Error updating token table: ${err.message}`, 'error');
+                });
+        }
+
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => {
@@ -318,17 +378,32 @@
                 tab.classList.add('active');
                 tab.setAttribute('aria-selected', 'true');
                 document.getElementById(tab.dataset.tab).classList.add('active');
+                if (tab.dataset.tab === 'token_manager') {
+                    updateTokenTable();
+                }
+                log(tab.dataset.tab, `Switched to ${tab.dataset.tab} tab`, 'info');
             });
         });
 
         window.addEventListener('load', () => {
             document.getElementById('disclaimer-modal').style.display = 'flex';
             document.getElementById('main-container').classList.add('blur');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 2 + 1}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                document.querySelector('.stars').appendChild(star);
+            }
         });
 
         document.getElementById('agree-disclaimer').addEventListener('click', () => {
             document.getElementById('disclaimer-modal').style.display = 'none';
             document.getElementById('main-container').classList.remove('blur');
+            log('misc', 'Disclaimer agreed', 'info');
         });
 
         document.getElementById('import-tokens').addEventListener('click', () => {
@@ -348,6 +423,29 @@
             reader.readAsText(file);
         });
 
+        document.getElementById('export-tokens').addEventListener('click', () => {
+            fetch('/export_tokens')
+                .then(response => response.json())
+                .then(data => {
+                    const blob = new Blob([JSON.stringify(data.tokens, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'tokens.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    log('checker', 'Tokens exported', 'success');
+                    showNotification('Tokens exported', 'success');
+                })
+                .catch(err => {
+                    log('checker', `Error exporting tokens: ${err.message}`, 'error');
+                });
+        });
+
+        document.getElementById('export-tokens-manager').addEventListener('click', () => {
+            document.getElementById('export-tokens').click();
+        });
+
         document.getElementById('start-joiner').addEventListener('click', () => {
             if (!validTokens.length) {
                 log('joiner', 'No valid tokens available.', 'error');
@@ -357,10 +455,12 @@
             const inviteCode = document.getElementById('invite-code').value;
             if (!inviteCode) {
                 log('joiner', 'Invite code required', 'error');
+                showNotification('Invite code required', 'error');
                 return;
             }
             const delay = document.getElementById('join-delay').value || '2';
             const maxJoins = document.getElementById('max-joins').value || tokens.length;
+            log('joiner', 'Starting joiner...', 'info');
             fetch('/join', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -390,9 +490,11 @@
             const serverId = document.getElementById('server-id').value;
             if (!serverId) {
                 log('leaver', 'Guild ID required', 'error');
+                showNotification('Guild ID required', 'error');
                 return;
             }
             const delay = document.getElementById('leave-delay').value || '2';
+            log('leaver', 'Starting leaver...', 'info');
             fetch('/leave', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -420,15 +522,19 @@
                 return;
             }
             const channelId = document.getElementById('spam-channel').value;
-            let message = document.getElementById('spam-message').value;
+            const message = document.getElementById('spam-message').value;
             const randomEmojis = document.getElementById('random-emojis').checked;
             const randomStrings = document.getElementById('random-strings').checked;
+            const addEveryone = document.getElementById('add-everyone').checked;
+            const disableDelay = document.getElementById('disable-delay').checked;
             if (!channelId || !message) {
                 log('spammer', 'Channel ID or message required', 'error');
+                showNotification('Channel ID or message required', 'error');
                 return;
             }
             const delay = document.getElementById('spam-delay').value || '1';
             const spamCount = document.getElementById('spam-count').value || '10';
+            log('spammer', 'Starting spammer...', 'info');
             fetch('/spam', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -437,10 +543,12 @@
                     channelId,
                     message,
                     delay,
+                    disableDelay,
                     spamCount,
                     maxThreads: 5,
                     randomEmojis,
-                    randomStrings
+                    randomStrings,
+                    addEveryone
                 })
             }).then(response => response.json()).then(data => {
                 data.results.forEach(result => log('spammer', `${result.token}: ${result.message}`, result.status));
@@ -462,9 +570,11 @@
             tokens = document.getElementById('token-area').value.split('\n').map(t => t.trim()).filter(t => t);
             if (!tokens.length) {
                 log('checker', 'No tokens to check', 'error');
+                showNotification('No tokens to check', 'error');
                 return;
             }
             const maxThreads = document.getElementById('parallel-checks').value || '5';
+            log('checker', 'Starting checker...', 'info');
             fetch('/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -485,19 +595,25 @@
         document.getElementById('show-proxy-settings').addEventListener('click', () => {
             document.getElementById('proxy-modal').style.display = 'flex';
             document.getElementById('main-container').classList.add('blur');
+            log('misc', 'Opened proxy settings', 'info');
         });
 
         document.getElementById('save-proxies').addEventListener('click', () => {
             const proxies = document.getElementById('proxy-area').value.split('\n').map(p => p.trim()).filter(p => p);
+            const proxyType = document.getElementById('proxy-type').value;
+            const proxiesData = proxies.map(proxy => ({ proxy_string: proxy, proxy_type: proxyType }));
+            log('misc', 'Saving proxies...', 'info');
             fetch('/proxies', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ proxies })
+                body: JSON.stringify({ proxies: proxiesData })
             }).then(response => response.json()).then(data => {
                 log('misc', data.message, 'success');
                 showNotification(data.message, 'success');
                 document.getElementById('proxy-modal').style.display = 'none';
                 document.getElementById('main-container').classList.remove('blur');
+            }).catch(err => {
+                log('misc', `Error saving proxies: ${err.message}`, 'error');
             });
         });
 
@@ -516,46 +632,65 @@
         document.getElementById('close-proxy-modal').addEventListener('click', () => {
             document.getElementById('proxy-modal').style.display = 'none';
             document.getElementById('main-container').classList.remove('blur');
+            log('misc', 'Closed proxy settings', 'info');
         });
 
         function pollStatus(tab, total) {
+            if (isPolling) {
+                console.log(`Polling skipped for ${tab}: already in progress`);
+                return;
+            }
+            isPolling = true;
+
             fetch('/check_status')
                 .then(response => response.json())
                 .then(data => {
+                    console.log(`Poll status for ${tab}:`, data);
                     const results = tab === 'checker' ? data.checker_results :
-                                tab === 'joiner' ? data.joiner_results :
-                                tab === 'leaver' ? data.leaver_results :
-                                data.spammer_results;
+                                    tab === 'joiner' ? data.joiner_results :
+                                    tab === 'leaver' ? data.leaver_results :
+                                    data.spammer_results;
                     const isRunning = data[`${tab}_running`];
-                    results.forEach(result => log(tab, `${result.token}: ${result.message}`, result.status));
+
+                    // 結果が存在する場合のみログを追加
+                    if (results.length > 0) {
+                        results.forEach(result => {
+                            const message = `${result.token}: ${result.message}`;
+                            if (!lastResults[tab].some(lr => lr.token === result.token && lr.message === result.message)) {
+                                log(tab, message, result.status);
+                            }
+                        });
+                    } else {
+                        log(tab, `No new results for ${tab}`, 'info');
+                    }
+                    lastResults[tab] = [...results];
 
                     const completed = results.length;
-                    document.getElementById(`${tab}-progress`).style.width = `${(completed / total) * 100}%`;
+                    document.getElementById(`${tab}-progress`).style.width = `${Math.min((completed / total) * 100, 100)}%`;
                     document.getElementById(`${tab}-counter`).textContent = `${completed}/${total}`;
 
                     if (tab === 'checker') updateCheckerStats(results);
+                    if (tab === 'token_manager') updateTokenTable();
 
                     if (!isRunning || completed >= total) {
                         document.getElementById(`${tab}-status`).textContent = 'Status: Completed';
                         updateStatus(data.joiner_running || data.leaver_running || data.spammer_running || data.checker_running);
                         showNotification(`${tab.charAt(0).toUpperCase() + tab.slice(1)} completed`, 'success');
+                        isPolling = false;
                     } else {
                         document.getElementById(`${tab}-status`).textContent = 'Status: Running...';
                         updateStatus(true);
-                        setTimeout(() => pollStatus(tab, total), 1000);
+                        setTimeout(() => {
+                            isPolling = false;
+                            pollStatus(tab, total);
+                        }, 1000);
                     }
+                })
+                .catch(err => {
+                    log(tab, `Polling error: ${err.message}`, 'error');
+                    console.error(`Polling error for ${tab}:`, err);
+                    isPolling = false;
                 });
-        }
-
-        for (let i = 0; i < 50; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.width = `${Math.random() * 2 + 1}px`;
-            star.style.height = star.style.width;
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.top = `${Math.random() * 100}%`;
-            star.style.animationDelay = `${Math.random() * 5}s`;
-            document.querySelector('.stars').appendChild(star);
         }
     </script>
 </body>
