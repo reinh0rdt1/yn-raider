@@ -1,18 +1,21 @@
 # YN-RAIDER [WEB-UI VERSION] 🚀
 
----
-
-## 📸 SHOWCASE
-
-![image](https://github.com/user-attachments/assets/aa158e26-3b01-4de8-9c95-34679dbb7620)
+A sleek, lightweight **Discord automation tool** powered by **Python** and **Flask**. Automate server joining, token management, message spamming, and more through an intuitive web interface. Built for developers and enthusiasts, YN-RAIDER is your go-to for Discord automation tasks! 🎉
 
 ![Discord Raider](https://img.shields.io/badge/Discord-Raider-blueviolet?style=flat-square)  
 ![Python](https://img.shields.io/badge/Python-3.8+-yellow?style=flat-square)  
-A lightweight Discord automation tool built with Flask and Python. Join servers, manage tokens, spam messages, or validate tokens—all through a sleek web interface! 🎉
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-> **⚠️ Disclaimer**: This project is for **educational purposes only**. Use responsibly and adhere to [Discord Terms of Service](https://discord.com/terms). The author is not liable for misuse.
+> **⚠️ Disclaimer**: This tool is for **educational purposes only**. Use responsibly and in compliance with [Discord's Terms of Service](https://discord.com/terms). The author is not liable for misuse.
 
-> 👥 Need support? Discord Link: [Discord Link](https://discord.gg/HemBmKMYKF)
+> 👥 **Get Support**: Join our community on [Discord](https://discord.gg/HemBmKMYKF)
+
+---
+
+## 📸 Showcase
+
+![YN-RAIDER Web Interface](https://cdn.discordapp.com/attachments/1348988362693808218/1366219101348827246/image.png?ex=68102630&is=680ed4b0&hm=a0b73a99dccac5dabe891e85cc828aa4d518bbf715b8cc7dc79241bd2425271e&)
+
 ---
 
 ## ✨ Features
