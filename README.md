@@ -14,7 +14,7 @@ A sleek, lightweight **Discord automation tool** powered by **Python** and **Fla
 
 ## 📸 Showcase
 
-![YN-RAIDER Web Interface]([https://imgur.com/a/6n7LvHJ))
+![SHOWCASE](https://i.imgur.com/6SWNSo6.png)
 
 ---
 
