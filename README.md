@@ -1,6 +1,6 @@
 # YN-RAIDER [WEB-UI VERSION] 🚀
 
-A sleek, lightweight **Discord automation tool** powered by **Python** and **Flask**. Automate server joining, token management, message spamming, and more through an intuitive web interface. Built for developers and enthusiasts, YN-RAIDER is your go-to for Discord automation tasks! 🎉
+A sleek, lightweight **Discord automation tool** powered by **Python** and **Flask**. Automate server joining, token management, message spamming, and more through an intuitive web interface. Built for developers and enthusiasts, YN-RAIDER is your go-to for Discord automation tasks 🎉
 
 ![Discord Raider](https://img.shields.io/badge/Discord-Raider-blueviolet?style=flat-square)  
 ![Python](https://img.shields.io/badge/Python-3.8+-yellow?style=flat-square)  
