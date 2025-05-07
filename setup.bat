@@ -1,5 +1,5 @@
 @echo off
-title YN Raider Setup & Run
+title YN Raider Setup & Run Console
 
 :: Initialize
 setlocal EnableDelayedExpansion
@@ -130,7 +130,7 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-%COLOR_GREEN%[Success] %APP_NAME% server started successfully.%COLOR_RESET%
+%COLOR_GREEN%[Success] %APP_NAME% server started successfully. Discord Server: https://discord.gg/d5XMev3stu Join Now! %COLOR_RESET%
 pause
 goto :end
 
